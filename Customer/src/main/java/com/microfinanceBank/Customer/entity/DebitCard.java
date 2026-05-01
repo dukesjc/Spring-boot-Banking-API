@@ -18,54 +18,68 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * 직불 카드 엔티티
+ * 고객의 직불 카드 정보를 저장합니다
+ */
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class DebitCard {
-
+    /** 카드 ID (기본키) */
     @Id
-//    @SequenceGenerator(name = "DebitCard" , sequenceName = "DEBIT_CARD_ID_SEQ")
-//    @GeneratedValue(generator = "DebitCard")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(fetch = FetchType.EAGER,mappedBy = "debitCard",cascade = {
-            CascadeType.DETACH,CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH
+    /** 카드가 연결된 계좌 목록 */
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "debitCard", cascade = {
+            CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH
     })
     @JsonManagedReference
     private Set<Account> accounts;
 
-    @Column(nullable = false,unique = true)
+    /** 카드 번호 (고유값) */
+    @Column(nullable = false, unique = true)
     private String cardNo;
 
-    @Column( nullable = false)
+    /** CVV 번호 */
+    @Column(nullable = false)
     private int cvvNo;
 
+    /** 카드 유형 */
     @Enumerated(EnumType.STRING)
     private CardType cardType;
 
+    /** 카드 상태 */
     @Enumerated(EnumType.STRING)
     private CardStatus cardStatus;
 
-    @Column( nullable = false)
+    /** 카드 발급 날짜 */
+    @Column(nullable = false)
     @CreationTimestamp
     private LocalDate issuedDate;
 
-    @Column( nullable = false)
+    /** 카드 만료 날짜 */
+    @Column(nullable = false)
     private LocalDate expireDate;
 
+    /** 마지막 거래 날짜 */
     @UpdateTimestamp
     private Date lastActivity;
 
-    public void addAccount(Account account){
-        if (account!=null) {
+    /**
+     * 계좌 추가
+     * 직불 카드에 계좌를 추가합니다
+     *
+     * @param account 추가할 계좌
+     */
+    public void addAccount(Account account) {
+        if (account != null) {
             if (this.accounts == null)
                 this.accounts = new HashSet<>();
-        this.accounts.add(account);
-        account.setDebitCard(this);
+            this.accounts.add(account);
+            account.setDebitCard(this);
         }
     }
-
-
 }

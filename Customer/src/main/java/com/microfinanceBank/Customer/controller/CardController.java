@@ -21,35 +21,31 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+/**
+ * 카드 컨트롤러
+ * 직불 카드 신청 등의 기능을 담당합니다
+ */
 @RestController
 @RequestMapping("api")
 @RequiredArgsConstructor
 public class CardController {
     private final CardService cardService;
 
+    /**
+     * 카드 신청
+     * 직불 카드를 신청합니다
+     *
+     * @param cardRequest 카드 신청 정보
+     * @return 신청 결과
+     */
     @PostMapping("card-request")
-<<<<<<< HEAD
-    @Operation(summary = "Card request",description = "Requesting for debit card",tags = "Post")
+    @Operation(summary = "카드 신청", description = "직불 카드를 신청합니다", tags = "Post")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201",description = "Card Request was successful",
+            @ApiResponse(responseCode = "201", description = "카드 신청 성공",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = CustomerDto.class))})})
-//    @XssFilter
-    public ResponseEntity requestCard(@Valid @RequestBody CardRequest cardRequest){
-=======
-    @Operation(summary = "Create more Account",description = "Create more Accounts for existing customers",tags = "Post")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201",description = "Account created successfully",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CustomerDto.class))})})
-    @XssFilter
-    public ResponseEntity createAccount(@Valid @RequestBody CardRequest cardRequest){
->>>>>>> 3042050908729fcb60132c5fbfdbb6f52055d03b
+    public ResponseEntity requestCard(@Valid @RequestBody CardRequest cardRequest) {
         cardService.cardRequest(cardRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-
-
-
 }

@@ -1,6 +1,5 @@
 package com.microfinanceBank.Customer.controller;
 
-
 import com.microfinanceBank.Customer.dto.CustomerDto;
 import com.microfinanceBank.Customer.dto.Register;
 import com.microfinanceBank.Customer.service.CustomerService;
@@ -21,81 +20,92 @@ import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import java.util.List;
 
-
-
-@CrossOrigin(origins = "*",allowedHeaders = "*")
+/**
+ * 고객 컨트롤러
+ * 고객 정보 생성, 조회, 수정, 삭제 등의 기능을 담당합니다
+ */
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("api")
 @RequiredArgsConstructor
 public class CustomerController {
-	private  final CustomerService customerService;
+    private final CustomerService customerService;
 
-	@PostMapping("customer")
-	@Operation(summary = "Create customers",description = "Create a customer account",tags = "Post")
-	@ApiResponses(value = {
-			@ApiResponse(responseCode = "201",description = "Created a customer account",
-			content = {@Content(mediaType = "application/json",
-			schema = @Schema(implementation = CustomerDto.class))}),
-			@ApiResponse(responseCode = "409",description = "Account with email address already exists",
-			content = @Content)})
-//	@XssFilter
-	public ResponseEntity<CustomerDto> createCustomer(@Valid @RequestBody Register register){
-		CustomerDto savedUser = customerService.createCustomer(register);
-<<<<<<< HEAD
-=======
-		System.out.println("webbbbbbbbbbb111111111111");
->>>>>>> 3042050908729fcb60132c5fbfdbb6f52055d03b
-		return new ResponseEntity<>(savedUser,HttpStatus.CREATED);
-	}
+    /**
+     * 고객 생성
+     * 새로운 고객 계좌를 생성합니다
+     *
+     * @param register 고객 등록 정보
+     * @return 생성된 고객 DTO
+     */
+    @PostMapping("customer")
+    @Operation(summary = "고객 생성", description = "고객 계좌를 생성합니다", tags = "Post")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "고객 계좌 생성 성공",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomerDto.class))}),
+            @ApiResponse(responseCode = "409", description = "이메일 주소가 이미 존재합니다",
+                    content = @Content)})
+    public ResponseEntity<CustomerDto> createCustomer(@Valid @RequestBody Register register) {
+        CustomerDto savedUser = customerService.createCustomer(register);
+        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+    }
 
-	@GetMapping("customers")
-	@RolesAllowed("ADMIN")
-	@Operation(summary = "Get customers",description = "Return a list of customers",tags = "Get")
-	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200",description = "Request was a success",
-					content = {@Content(mediaType = "application/json",
-							schema = @Schema(implementation = CustomerDto.class))}),
-			@ApiResponse(responseCode = "401",description = "Unauthorized access ",
-					content = @Content)})
-	@Retryable(maxAttempts = 2)
-	public ResponseEntity<List<CustomerDto>> getAllCustomers(){
-		List<CustomerDto> customers = customerService.getAllCustomer();
-		return new ResponseEntity<>(customers, HttpStatus.OK);
+    /**
+     * 모든 고객 조회
+     * 관리자용 기능으로 모든 고객을 조회합니다 (ADMIN 권한 필요)
+     *
+     * @return 모든 고객 목록
+     */
+    @GetMapping("customers")
+    @RolesAllowed("ADMIN")
+    @Operation(summary = "모든 고객 조회", description = "고객 목록을 반환합니다", tags = "Get")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "요청 성공",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomerDto.class))}),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 접근",
+                    content = @Content)})
+    @Retryable(maxAttempts = 2)
+    public ResponseEntity<List<CustomerDto>> getAllCustomers() {
+        List<CustomerDto> customers = customerService.getAllCustomer();
+        return new ResponseEntity<>(customers, HttpStatus.OK);
+    }
 
-	}
+    /**
+     * 고객 정보 수정
+     * 고객 계좌 정보를 수정합니다
+     *
+     * @param customer 고객 DTO
+     * @return 수정된 고객 DTO
+     */
+    @PatchMapping("customer")
+    @Operation(summary = "고객 정보 수정", description = "고객 계좌 정보를 수정합니다", tags = "Patch")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "요청 성공",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomerDto.class))})})
+    public ResponseEntity<CustomerDto> updateCustomerDetails(@Valid @RequestBody CustomerDto customer) {
+        CustomerDto customerDto = customerService.updateCustomerDetails(customer);
+        return new ResponseEntity<>(customerDto, HttpStatus.OK);
+    }
 
-
-	@PatchMapping("customer")
-	@Operation(summary = "Update customers",description = "updates a customer account",tags = "Put")
-	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200",description = "Request was successful",
-					content = {@Content(mediaType = "application/json",
-							schema = @Schema(implementation = CustomerDto.class))})})
-//	@XssFilter
-	public ResponseEntity<CustomerDto> updateCustomerDetails(@Valid @RequestBody CustomerDto customer){
-		CustomerDto customerDto = customerService.updateCustomerDetails(customer);
-		return new ResponseEntity<>(customerDto, HttpStatus.OK);
-	}
-
-	@DeleteMapping("customer")
-	@Operation(summary = "Delete customer including all  their accounts ",description = "Delete Accounts customer profile by id ",tags = "Delete")
-	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200",description = "Profile deleted",
-					content = {@Content(mediaType = "application/json",
-							schema = @Schema(implementation = Void.class))})})
-	public ResponseEntity deleteById(@RequestParam("id") Long id, @RequestParam("keycloakId") String keycloakId){
-		customerService.deleteCustomer(id,keycloakId);
-		return new ResponseEntity<>( HttpStatus.OK);
-	}
-
-
-//	@GetMapping("logout")
-//	public ResponseEntity logout(){
-//		customerService.logout();
-//	return new ResponseEntity(HttpStatus.OK) ;
-//	}
-
-
-
+    /**
+     * 고객 계좌 삭제
+     * 고객 및 모든 계좌를 삭제합니다
+     *
+     * @param id 고객 ID
+     * @param keycloakId Keycloak ID
+     * @return 삭제 결과
+     */
+    @DeleteMapping("customer")
+    @Operation(summary = "고객 삭제", description = "고객 및 모든 계좌를 삭제합니다", tags = "Delete")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "프로필 삭제 완료",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Void.class))})})
+    public ResponseEntity deleteById(@RequestParam("id") Long id, @RequestParam("keycloakId") String keycloakId) {
+        customerService.deleteCustomer(id, keycloakId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
-
